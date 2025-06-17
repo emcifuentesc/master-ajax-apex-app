@@ -33,18 +33,19 @@ prompt APPLICATION 141 - Kscope25 Master AJAX
 -- Application Export:
 --   Application:     141
 --   Name:            Kscope25 Master AJAX
---   Date and Time:   21:30 Saturday June 14, 2025
+--   Date and Time:   16:42 Tuesday June 17, 2025
 --   Exported By:     ECIFUENTES
 --   Flashback:       0
 --   Export Type:     Application Export
 --     Pages:                      5
---       Items:                    9
+--       Items:                   12
 --       Processes:               11
---       Regions:                 11
+--       Regions:                 12
 --       Buttons:                 11
---       Dynamic Actions:         10
+--       Dynamic Actions:         11
 --     Shared Components:
 --       Logic:
+--         Processes:              1
 --         Build Options:          2
 --       Navigation:
 --         Lists:                  2
@@ -1066,6 +1067,42 @@ end;
 prompt --application/shared_components/navigation/navigation_bar
 begin
 null;
+end;
+/
+prompt --application/shared_components/logic/application_processes/get_employee
+begin
+wwv_flow_imp_shared.create_flow_process(
+ p_id=>wwv_flow_imp.id(69317815081804340)
+,p_process_sequence=>1
+,p_process_point=>'ON_DEMAND'
+,p_process_type=>'NATIVE_PLSQL'
+,p_process_name=>'get_employee'
+,p_process_sql_clob=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'DECLARE',
+'    v_first_name    KSCOPE_MK_EMPLOYEES.first_name%TYPE;',
+'    v_last_name     KSCOPE_MK_EMPLOYEES.last_name%TYPE;',
+'BEGIN',
+'    select first_name, last_name',
+'    into v_first_name, v_last_name',
+'    from KSCOPE_MK_EMPLOYEES',
+'    where employee_id = apex_application.g_x01;',
+'    apex_json.open_object();',
+'    apex_json.write(''first_name'', v_first_name);',
+'    apex_json.write(''last_name'', v_last_name);',
+'    apex_json.close_object();',
+'EXCEPTION WHEN NO_DATA_FOUND THEN',
+'    apex_json.open_object();',
+'    apex_json.write(''error'', ''Employee not found.'');',
+'    apex_json.close_object();',
+'WHEN OTHERS THEN',
+'    apex_json.open_object();',
+'    apex_json.write(''error'', sqlerrm);',
+'    apex_json.close_object();',
+'END ;'))
+,p_process_clob_language=>'PLSQL'
+,p_security_scheme=>'MUST_NOT_BE_PUBLIC_USER'
+,p_version_scn=>38155331822535
+);
 end;
 /
 prompt --application/shared_components/logic/application_settings
@@ -7858,7 +7895,7 @@ wwv_flow_imp_shared.create_theme_style(
 ,p_css_file_urls=>wwv_flow_string.join(wwv_flow_t_varchar2(
 '#APEX_FILES#libraries/oracle-fonts/oraclesans-apex#MIN#.css?v=#APEX_VERSION#',
 '#THEME_FILES#css/Redwood#MIN#.css?v=#APEX_VERSION#'))
-,p_is_current=>false
+,p_is_current=>true
 ,p_is_public=>true
 ,p_is_accessible=>false
 ,p_theme_roller_input_file_urls=>'#THEME_FILES#less/theme/Redwood-Theme.less'
@@ -7870,7 +7907,7 @@ wwv_flow_imp_shared.create_theme_style(
  p_id=>wwv_flow_imp.id(68944760515897706)
 ,p_theme_id=>42
 ,p_name=>'Vita'
-,p_is_current=>true
+,p_is_current=>false
 ,p_is_public=>true
 ,p_is_accessible=>true
 ,p_theme_roller_input_file_urls=>'#THEME_FILES#less/theme/Vita.less'
@@ -18340,13 +18377,13 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_name=>'Reference'
 ,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
 ,p_plug_template=>wwv_flow_imp.id(68781747046897526)
-,p_plug_display_sequence=>50
+,p_plug_display_sequence=>80
 ,p_plug_new_grid_row=>false
 ,p_plug_grid_column_span=>2
 ,p_location=>null
 ,p_plug_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
 '<h3>',
-'    <a href="https://docs.oracle.com/en/database/oracle/apex/24.2/aexjs/apex.server.html#.process">Oracle APEX<br>JavaScript API</a>',
+'    <a href="https://docs.oracle.com/en/database/oracle/apex/24.2/aexjs/apex.server.html#.process" target="_blank">Oracle APEX<br>JavaScript API</a>',
 '</h3>',
 '<p class="u-textCenter">',
 '    <img src="#APP_FILES#js-api-qr_code.png" class="mxw200"/>',
@@ -18379,7 +18416,7 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_name=>'Error Handling'
 ,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
 ,p_plug_template=>wwv_flow_imp.id(68781747046897526)
-,p_plug_display_sequence=>20
+,p_plug_display_sequence=>30
 ,p_plug_new_grid_row=>false
 ,p_plug_new_grid_column=>false
 ,p_location=>null
@@ -18401,12 +18438,12 @@ wwv_flow_imp_page.create_page_plug(
 ,p_region_name=>'process_region'
 ,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
 ,p_plug_template=>wwv_flow_imp.id(68781747046897526)
-,p_plug_display_sequence=>30
+,p_plug_display_sequence=>40
 ,p_plug_new_grid_row=>false
 ,p_plug_new_grid_column=>false
 ,p_location=>null
 ,p_plug_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'<p>Basic use of apex.server.process</p>',
+'<p>Using apex.server.process</p>',
 '<ul>',
 '    <li>Utilizing the APEX Global Variables.</li>',
 '    <li>Submitting an item.</li>',
@@ -18421,13 +18458,13 @@ wwv_flow_imp_page.create_page_plug(
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(68979923956897769)
 ,p_plug_name=>'Kscope25 Master AJAX'
+,p_icon_css_classes=>'fa-cloud-upload'
 ,p_region_template_options=>'#DEFAULT#'
-,p_escape_on_http_output=>'Y'
 ,p_plug_template=>wwv_flow_imp.id(68758475860897516)
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'REGION_POSITION_01'
+,p_location=>null
 ,p_plug_query_num_rows=>15
-,p_region_image=>'#APP_FILES#icons/app-icon-512.png'
 ,p_attributes=>wwv_flow_t_plugin_attributes(wwv_flow_t_varchar2(
   'expand_shortcuts', 'N',
   'output_as', 'HTML',
@@ -18438,13 +18475,13 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_name=>'Source Code'
 ,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
 ,p_plug_template=>wwv_flow_imp.id(68781747046897526)
-,p_plug_display_sequence=>60
+,p_plug_display_sequence=>90
 ,p_plug_new_grid_row=>false
 ,p_plug_new_grid_column=>false
 ,p_location=>null
 ,p_plug_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
 '<h3>',
-'    <a href="https://github.com/emcifuentesc/master-ajax-apex-app">Get this Application''s export</a>',
+'    <a href="https://github.com/emcifuentesc/master-ajax-apex-app" target="_blank">Get this Application''s export</a>',
 '</h3>',
 '<p class="u-textCenter">',
 '    <img src="#APP_FILES#app-source-qr_code.png" class="mxw200"/>',
@@ -18458,7 +18495,7 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_name=>'Using Queues'
 ,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
 ,p_plug_template=>wwv_flow_imp.id(68781747046897526)
-,p_plug_display_sequence=>40
+,p_plug_display_sequence=>70
 ,p_plug_new_grid_row=>false
 ,p_plug_new_grid_column=>false
 ,p_location=>null
@@ -18874,6 +18911,20 @@ wwv_flow_imp_page.create_ig_report_column(
 ,p_is_visible=>true
 ,p_is_frozen=>false
 );
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(69014146247556644)
+,p_plug_name=>'Validations'
+,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
+,p_plug_template=>wwv_flow_imp.id(68781747046897526)
+,p_plug_display_sequence=>50
+,p_plug_new_grid_row=>false
+,p_plug_new_grid_column=>false
+,p_location=>null
+,p_plug_source=>'<p>Trigger a validation in the On Change event, fetch several values from a table, and handle errors gracefully.</p>'
+,p_attributes=>wwv_flow_t_plugin_attributes(wwv_flow_t_varchar2(
+  'expand_shortcuts', 'N',
+  'output_as', 'HTML')).to_clob
+);
 wwv_flow_imp_page.create_page_button(
  p_id=>wwv_flow_imp.id(40508834657051220)
 ,p_button_sequence=>10
@@ -19074,6 +19125,52 @@ wwv_flow_imp_page.create_page_item(
 ,p_attribute_02=>'N'
 ,p_attribute_04=>'TEXT'
 ,p_attribute_05=>'BOTH'
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(69014393291556646)
+,p_name=>'P1_EMPLOYEE_ID'
+,p_item_sequence=>10
+,p_item_plug_id=>wwv_flow_imp.id(69014146247556644)
+,p_prompt=>'Employee ID'
+,p_display_as=>'NATIVE_TEXT_FIELD'
+,p_cSize=>30
+,p_colspan=>3
+,p_field_template=>wwv_flow_imp.id(68852813841897560)
+,p_item_template_options=>'#DEFAULT#'
+,p_attribute_01=>'N'
+,p_attribute_02=>'N'
+,p_attribute_04=>'TEXT'
+,p_attribute_05=>'BOTH'
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(69014459048556647)
+,p_name=>'P1_EMPLOYEE_FIRST_NAME'
+,p_item_sequence=>20
+,p_item_plug_id=>wwv_flow_imp.id(69014146247556644)
+,p_prompt=>'First Name'
+,p_display_as=>'NATIVE_DISPLAY_ONLY'
+,p_begin_on_new_line=>'N'
+,p_field_template=>wwv_flow_imp.id(68852813841897560)
+,p_item_template_options=>'#DEFAULT#'
+,p_attribute_01=>'Y'
+,p_attribute_02=>'VALUE'
+,p_attribute_04=>'Y'
+,p_attribute_05=>'PLAIN'
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(69325122884895201)
+,p_name=>'P1_EMPLOYEE_LAST_NAME'
+,p_item_sequence=>30
+,p_item_plug_id=>wwv_flow_imp.id(69014146247556644)
+,p_prompt=>'Last Name'
+,p_display_as=>'NATIVE_DISPLAY_ONLY'
+,p_begin_on_new_line=>'N'
+,p_field_template=>wwv_flow_imp.id(68852813841897560)
+,p_item_template_options=>'#DEFAULT#'
+,p_attribute_01=>'Y'
+,p_attribute_02=>'VALUE'
+,p_attribute_04=>'Y'
+,p_attribute_05=>'PLAIN'
 );
 wwv_flow_imp_page.create_page_da_event(
  p_id=>wwv_flow_imp.id(40509265366051224)
@@ -19379,6 +19476,55 @@ wwv_flow_imp_page.create_page_da_action(
 '                ',
 '            }',
 '    }',
+');'))
+);
+wwv_flow_imp_page.create_page_da_event(
+ p_id=>wwv_flow_imp.id(69014652234556649)
+,p_name=>'On Change (P1_EMPLOYEE_ID)'
+,p_event_sequence=>110
+,p_triggering_element_type=>'ITEM'
+,p_triggering_element=>'P1_EMPLOYEE_ID'
+,p_condition_element=>'P1_EMPLOYEE_ID'
+,p_triggering_condition_type=>'NOT_NULL'
+,p_bind_type=>'bind'
+,p_execution_type=>'IMMEDIATE'
+,p_bind_event_type=>'change'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(69014719712556650)
+,p_event_id=>wwv_flow_imp.id(69014652234556649)
+,p_event_result=>'TRUE'
+,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_action=>'NATIVE_JAVASCRIPT_CODE'
+,p_attribute_01=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'',
+'',
+'var result = apex.server.process( ''get_employee'', {',
+'        x01: apex.item(''P1_EMPLOYEE_ID'').getValue()',
+'    },{',
+'        clear :function(){',
+'            apex.message.clearErrors();',
+'            apex.item(''P1_EMPLOYEE_FIRST_NAME'').setValue('''');',
+'            apex.item(''P1_EMPLOYEE_LAST_NAME'').setValue('''');',
+'        }',
+'    });',
+'',
+'result.done( function( data ) {',
+'    apex.item(''P1_EMPLOYEE_FIRST_NAME'').setValue(data.first_name);',
+'    apex.item(''P1_EMPLOYEE_LAST_NAME'').setValue(data.last_name);',
+'',
+'}).fail(function( jqXHR, textStatus, errorThrown ) {',
+'    apex.message.showErrors( [',
+'        {',
+'            type:       "error",',
+'            location:   "page",',
+'            message:    jqXHR.responseJSON.error,',
+'            unsafe:     false',
+'        }',
+'        ]',
+'    );',
+'}',
 ');'))
 );
 wwv_flow_imp_page.create_page_process(

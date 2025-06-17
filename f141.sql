@@ -33,7 +33,7 @@ prompt APPLICATION 141 - Kscope25 Master AJAX
 -- Application Export:
 --   Application:     141
 --   Name:            Kscope25 Master AJAX
---   Date and Time:   16:42 Tuesday June 17, 2025
+--   Date and Time:   19:14 Tuesday June 17, 2025
 --   Exported By:     ECIFUENTES
 --   Flashback:       0
 --   Export Type:     Application Export
@@ -18300,6 +18300,32 @@ wwv_flow_imp_page.create_page(
 ,p_warn_on_unsaved_changes=>'N'
 ,p_autocomplete_on_off=>'OFF'
 ,p_javascript_code=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'async function validateEmployee(employee_id, clearFn) {',
+'  try {',
+'    const data = await apex.server.process(',
+'      ''get_employee'',',
+'      {',
+'        x01: employee_id',
+'      },',
+'      {',
+'        clear: clearFn',
+'      }',
+'    );',
+'',
+'    return data; ',
+'  } catch (error) {',
+'    apex.message.showErrors([',
+'      {',
+'        type: "error",',
+'        location: "page",',
+'        message: error.responseJSON?.error || ''Unexpected error occurred.'',',
+'        unsafe: false',
+'      }',
+'    ]);',
+'    throw error;',
+'  }',
+'}',
+'',
 'function processSync(){',
 '    let lSpinner$ = apex.util.showSpinner(''#projects-grid'' );',
 '    let model = apex.region("projects-grid").widget().interactiveGrid("getViews", "grid").model; ',
@@ -19498,34 +19524,22 @@ wwv_flow_imp_page.create_page_da_action(
 ,p_execute_on_page_init=>'N'
 ,p_action=>'NATIVE_JAVASCRIPT_CODE'
 ,p_attribute_01=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'',
-'',
-'var result = apex.server.process( ''get_employee'', {',
-'        x01: apex.item(''P1_EMPLOYEE_ID'').getValue()',
-'    },{',
-'        clear :function(){',
-'            apex.message.clearErrors();',
-'            apex.item(''P1_EMPLOYEE_FIRST_NAME'').setValue('''');',
-'            apex.item(''P1_EMPLOYEE_LAST_NAME'').setValue('''');',
-'        }',
-'    });',
-'',
-'result.done( function( data ) {',
-'    apex.item(''P1_EMPLOYEE_FIRST_NAME'').setValue(data.first_name);',
-'    apex.item(''P1_EMPLOYEE_LAST_NAME'').setValue(data.last_name);',
-'',
-'}).fail(function( jqXHR, textStatus, errorThrown ) {',
-'    apex.message.showErrors( [',
-'        {',
-'            type:       "error",',
-'            location:   "page",',
-'            message:    jqXHR.responseJSON.error,',
-'            unsafe:     false',
-'        }',
-'        ]',
-'    );',
+'async function validate(){',
+'    var data = await validateEmployee(apex.item(''P1_EMPLOYEE_ID'').getValue(),',
+'        function () {',
+'                apex.message.clearErrors();',
+'                apex.item(''P1_EMPLOYEE_FIRST_NAME'').setValue('''');',
+'                apex.item(''P1_EMPLOYEE_LAST_NAME'').setValue('''');',
+'            }',
+'        );',
+'    if(data && data.first_name){',
+'        apex.item(''P1_EMPLOYEE_FIRST_NAME'').setValue(data.first_name);',
+'        apex.item(''P1_EMPLOYEE_LAST_NAME'').setValue(data.last_name);',
+'    }',
 '}',
-');'))
+'validate();',
+'',
+''))
 );
 wwv_flow_imp_page.create_page_process(
  p_id=>wwv_flow_imp.id(69014034652556643)
